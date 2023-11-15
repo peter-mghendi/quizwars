@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor.Services;
 using Npgsql;
 using QuizWars.Client.Pages;
 using QuizWars.Components;
@@ -54,6 +55,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityMailKitEmailSender>();
+builder.Services.AddMudServices();
 
 var app = builder.Build();
 

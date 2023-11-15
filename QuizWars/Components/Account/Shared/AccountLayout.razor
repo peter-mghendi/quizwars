@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-@layout QuizWars.Components.Layout.MainLayout
+@layout QuizWars.Client.Layout.MainLayout
 @inject NavigationManager NavigationManager
 
 @if (HttpContext is null)
@@ -26,3 +26,9 @@ else
         }
     }
 }
+.mud-input.mud-input-filled.mud-input-underline:hover:before 
+.mud-input.mud-input-underline:hover:not(.mud-disabled):before
+.mud-input.mud-input-filled.mud-input-underline:before
+.mud-input.mud-input-underline:before
+.mud-input.mud-input-filled.mud-input-underline:after
+.mud-input.mud-input-underline:after 

@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MudBlazor" Version="6.11.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-rc.2" />
     <ProjectReference Include="..\QuizWars.Client\QuizWars.Client.csproj" />
     <PackageReference Include="MailKit" Version="4.3.0" />
@@ -16,6 +17,13 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\bootstrap\bootstrap.min.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\bootstrap\bootstrap.min.css.map" />
+    <_ContentIncludedByDefault Remove="Components\Layout\MainLayout.razor" />
+    <_ContentIncludedByDefault Remove="Components\Layout\NavMenu.razor" />
   </ItemGroup>
 
 </Project>

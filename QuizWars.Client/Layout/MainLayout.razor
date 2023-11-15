@@ -1,0 +1,62 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider IsDarkMode="true"/>
+
+<MudLayout>
+    <MudAppBar Elevation="0">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
+        <MudText Typo="Typo.h5" Class="ml-3">QuizWars</MudText>
+        <MudSpacer/>
+        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Responsive" ClipMode="DrawerClipMode.Docked" Elevation="0">
+        <MudDrawerHeader>
+            <MudTextField @bind-Value="Search" Label="Search" Variant="Variant.Filled" Class="search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Rounded.Search"/>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.Home">Home</MudNavLink>
+            <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocalLibrary">Counter</MudNavLink>
+            <MudNavLink Href="weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Forum">Weather</MudNavLink>
+            <MudNavLink Href="auth" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Forum">Auth Required</MudNavLink>
+            <AuthorizeView>
+                <Authorized>
+                    <MudNavLink Href="Account/Manage" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.Person">@context.User.Identity?.Name</MudNavLink>
+                    <MudNavLink OnClick="Logout" Match="NavLinkMatch.All" Icon="@Icons.Material.TwoTone.Logout">Logout</MudNavLink>
+                </Authorized>
+                <NotAuthorized>
+                    <MudNavLink Href="Account/Register" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.PersonAddAlt1">Register</MudNavLink>
+                    <MudNavLink Href="Account/Login" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.Login">Login</MudNavLink>
+                </NotAuthorized>
+            </AuthorizeView>
+        </MudNavMenu>
+    </MudDrawer>
+    <MudMainContent Class="mud-height-full" Style="background-color: var(--mud-palette-background-grey);">
+        <div class="pa-4 mud-height-full">
+            <div class="pa-8 mud-height-full rounded-xl" Style="background-color: var(--mud-palette-background)">
+                @Body
+            </div>
+        </div>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen = true;
+    private string? Search { get; set; }
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    void Logout()
+    {
+        Console.WriteLine("logout");
+    }
+
+}
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
