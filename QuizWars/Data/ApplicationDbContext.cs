@@ -7,7 +7,7 @@ namespace QuizWars.Data;
 public class ApplicationDbContext
     (DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
-    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Topic> Topics => Set<Topic>();
 
     public DbSet<Choice> Choices => Set<Choice>();
 
@@ -47,8 +47,8 @@ public class ApplicationDbContext
             .HasMany(e => e.Responses)
             .WithOne(e => e.Round);
         
-        modelBuilder.Entity<Category>()
+        modelBuilder.Entity<Topic>()
             .HasMany(e => e.Questions)
-            .WithOne(e => e.Category);
+            .WithOne(e => e.Topic);
     }
 }

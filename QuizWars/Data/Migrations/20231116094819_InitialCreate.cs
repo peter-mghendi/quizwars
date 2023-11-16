@@ -52,7 +52,7 @@ namespace QuizWars.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Categories",
+                name: "Topics",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -62,7 +62,7 @@ namespace QuizWars.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Categories", x => x.Id);
+                    table.PrimaryKey("PK_Topics", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -178,7 +178,7 @@ namespace QuizWars.Data.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Text = table.Column<string>(type: "text", nullable: false),
-                    CategoryId = table.Column<long>(type: "bigint", nullable: false),
+                    TopicId = table.Column<long>(type: "bigint", nullable: false),
                     PlayerOneId = table.Column<string>(type: "text", nullable: true),
                     PlayerTwoId = table.Column<string>(type: "text", nullable: false)
                 },
@@ -197,9 +197,9 @@ namespace QuizWars.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Games_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
+                        name: "FK_Games_Topics_TopicId",
+                        column: x => x.TopicId,
+                        principalTable: "Topics",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -211,15 +211,15 @@ namespace QuizWars.Data.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Text = table.Column<string>(type: "text", nullable: false),
-                    CategoryId = table.Column<long>(type: "bigint", nullable: false)
+                    TopicId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Questions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Questions_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
+                        name: "FK_Questions_Topics_TopicId",
+                        column: x => x.TopicId,
+                        principalTable: "Topics",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -347,11 +347,6 @@ namespace QuizWars.Data.Migrations
                 column: "QuestionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Games_CategoryId",
-                table: "Games",
-                column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Games_PlayerOneId",
                 table: "Games",
                 column: "PlayerOneId");
@@ -362,9 +357,14 @@ namespace QuizWars.Data.Migrations
                 column: "PlayerTwoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Questions_CategoryId",
+                name: "IX_Games_TopicId",
+                table: "Games",
+                column: "TopicId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Questions_TopicId",
                 table: "Questions",
-                column: "CategoryId");
+                column: "TopicId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Responses_ChoiceId",
@@ -432,7 +432,7 @@ namespace QuizWars.Data.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "Topics");
         }
     }
 }

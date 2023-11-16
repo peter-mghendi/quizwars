@@ -1,6 +1,6 @@
 namespace QuizWars.Models;
 
-public class Category
+public class Topic
 {
     public long Id { get; set; }
 

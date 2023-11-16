@@ -218,27 +218,6 @@ namespace QuizWars.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("QuizWars.Models.Category", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Categories");
-                });
-
             modelBuilder.Entity("QuizWars.Models.Choice", b =>
                 {
                     b.Property<long>("Id")
@@ -272,9 +251,6 @@ namespace QuizWars.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("CategoryId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("PlayerOneId")
                         .HasColumnType("text");
 
@@ -286,13 +262,16 @@ namespace QuizWars.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.Property<long>("TopicId")
+                        .HasColumnType("bigint");
 
-                    b.HasIndex("CategoryId");
+                    b.HasKey("Id");
 
                     b.HasIndex("PlayerOneId");
 
                     b.HasIndex("PlayerTwoId");
+
+                    b.HasIndex("TopicId");
 
                     b.ToTable("Games");
                 });
@@ -305,16 +284,16 @@ namespace QuizWars.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("CategoryId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long>("TopicId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("TopicId");
 
                     b.ToTable("Questions");
                 });
@@ -374,6 +353,27 @@ namespace QuizWars.Data.Migrations
                     b.HasIndex("QuestionId");
 
                     b.ToTable("Rounds");
+                });
+
+            modelBuilder.Entity("QuizWars.Models.Topic", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Topics");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -440,12 +440,6 @@ namespace QuizWars.Data.Migrations
 
             modelBuilder.Entity("QuizWars.Models.Game", b =>
                 {
-                    b.HasOne("QuizWars.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("QuizWars.Data.ApplicationUser", "PlayerOne")
                         .WithMany("CreatedGames")
                         .HasForeignKey("PlayerOneId");
@@ -456,22 +450,28 @@ namespace QuizWars.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Category");
+                    b.HasOne("QuizWars.Models.Topic", "Topic")
+                        .WithMany()
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("PlayerOne");
 
                     b.Navigation("PlayerTwo");
+
+                    b.Navigation("Topic");
                 });
 
             modelBuilder.Entity("QuizWars.Models.Question", b =>
                 {
-                    b.HasOne("QuizWars.Models.Category", "Category")
+                    b.HasOne("QuizWars.Models.Topic", "Topic")
                         .WithMany("Questions")
-                        .HasForeignKey("CategoryId")
+                        .HasForeignKey("TopicId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Category");
+                    b.Navigation("Topic");
                 });
 
             modelBuilder.Entity("QuizWars.Models.Response", b =>
@@ -523,11 +523,6 @@ namespace QuizWars.Data.Migrations
                     b.Navigation("InvitedGames");
                 });
 
-            modelBuilder.Entity("QuizWars.Models.Category", b =>
-                {
-                    b.Navigation("Questions");
-                });
-
             modelBuilder.Entity("QuizWars.Models.Game", b =>
                 {
                     b.Navigation("Rounds");
@@ -541,6 +536,11 @@ namespace QuizWars.Data.Migrations
             modelBuilder.Entity("QuizWars.Models.Round", b =>
                 {
                     b.Navigation("Responses");
+                });
+
+            modelBuilder.Entity("QuizWars.Models.Topic", b =>
+                {
+                    b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
         }

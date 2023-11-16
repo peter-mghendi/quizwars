@@ -8,7 +8,7 @@ public class Game
 
     public required string Text { get; set; }
 
-    public required Category Category { get; set; }
+    public required Topic Topic { get; set; }
 
     public required ApplicationUser PlayerOne { get; set; }
 
