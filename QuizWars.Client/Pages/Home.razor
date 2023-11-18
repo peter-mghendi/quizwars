@@ -2,10 +2,13 @@
 @using QuizWars.Shared.Models.Response
 @using QuizWars.Sdk
 @using QuizWars.Client.Components.Dialogs
+@using QuizWars.Client.Extensions
 @using QuizWars.Shared.Models.Request
 
 @inject IDialogService DialogService
+@inject NavigationManager Navigation
 @inject QuizWarsClient QuizWars
+
 <PageTitle>Home</PageTitle>
 
 <MudGrid>
@@ -13,7 +16,7 @@
     {
         <MudItem xs="6" sm="4" md="3">
             <MudCard Class="rounded-lg">
-                <MudCardMedia Image="@ImageUrl(topic)"/>
+                <MudCardMedia Image="@topic.GetImageUrl()"/>
                 <MudCardHeader>@topic.Title</MudCardHeader>
                 <MudCardContent>@topic.Description</MudCardContent>
                 <MudCardActions>
@@ -30,6 +33,7 @@
 
 @code
 {
+    
     private List<TopicResponse> Topics { get; set; } = [];
 
     protected override async Task OnInitializedAsync()
@@ -44,11 +48,6 @@
         }
     }
 
-    private string ImageUrl(TopicResponse topic)
-    {
-        return $"https://fakeimg.pl/345x300/282828/eae0d0/?retina=1&text={topic.Title}";
-    }
-
     private async Task Play(TopicResponse topic)
     {
         var opponent = await SelectUser();
@@ -58,7 +57,9 @@
         }
         
         var request = new CreateGameRequest(topic.Id, opponent.UserId);
-        await QuizWars.Games.CreateGame(request);
+        var game = await QuizWars.Games.CreateGame(request);
+        
+        Navigation.NavigateTo($"game/{game.Identifier}/play");
     }
 
     private async Task<UserInfo?> SelectUser()
@@ -67,4 +68,5 @@
         var result = await dialog.Result;
         return result.Data as UserInfo;
     }
+    
 }

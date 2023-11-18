@@ -6,8 +6,16 @@ namespace QuizWars.Sdk.Services;
 
 public class GameService(HttpClient client)
 {
-    public async Task CreateGame(CreateGameRequest request)
+    public async Task<GameResponse> GetGame(Guid identifier)
     {
-        await client.PostAsJsonAsync("api/games", request);
+        var response = await client.GetFromJsonAsync<GameResponse>($"api/games/{identifier}");
+        return response!;
+    } 
+    
+    public async Task<GameResponse> CreateGame(CreateGameRequest request)
+    {
+        var response = await client.PostAsJsonAsync("api/games", request);
+        var game = await response.Content.ReadFromJsonAsync<GameResponse>();
+        return game!;
     } 
 }

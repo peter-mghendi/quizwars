@@ -10,7 +10,7 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudList Clickable="true" SelectedItemChanged="Challenge">
+        <MudList SelectedItemChanged="Challenge" Clickable>
             @foreach (var user in Users)
             {
                 <MudListItem Text="@user.Email" Avatar="@Icons.Material.Filled.Person" Value="user"/>

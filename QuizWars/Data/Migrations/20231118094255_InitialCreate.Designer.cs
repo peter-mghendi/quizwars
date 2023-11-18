@@ -12,7 +12,7 @@ using QuizWars.Data;
 namespace QuizWars.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231117135536_InitialCreate")]
+    [Migration("20231118094255_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -254,6 +254,9 @@ namespace QuizWars.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<Guid>("Identifier")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("PlayerOneId")
                         .HasColumnType("text");
 
@@ -265,6 +268,9 @@ namespace QuizWars.Data.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Identifier")
+                        .IsUnique();
 
                     b.HasIndex("PlayerOneId");
 

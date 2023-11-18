@@ -177,6 +177,7 @@ namespace QuizWars.Data.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Identifier = table.Column<Guid>(type: "uuid", nullable: false),
                     TopicId = table.Column<long>(type: "bigint", nullable: false),
                     PlayerOneId = table.Column<string>(type: "text", nullable: true),
                     PlayerTwoId = table.Column<string>(type: "text", nullable: false)
@@ -344,6 +345,12 @@ namespace QuizWars.Data.Migrations
                 name: "IX_Choices_QuestionId",
                 table: "Choices",
                 column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Games_Identifier",
+                table: "Games",
+                column: "Identifier",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Games_PlayerOneId",

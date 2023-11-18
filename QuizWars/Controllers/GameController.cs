@@ -24,11 +24,15 @@ public class GameController(ApplicationDbContext context, ILogger<GameController
         return await context.Games.Select(g => g.AsResponse()).ToListAsync();
     }
 
-    // GET: api/games/5
-    [HttpGet("{id}")]
-    public async Task<ActionResult<GameResponse>> GetGame(long id)
+    // GET: api/games/0085f04e-8a30-449e-91e1-38899b4d3ed5
+    [HttpGet("{identifier}")]
+    public async Task<ActionResult<GameResponse>> GetGame(Guid identifier)
     {
-        var game = await context.Games.FindAsync(id);
+        var game = await context.Games
+            .Include(g => g.Topic)
+            .Include(g => g.PlayerOne)
+            .Include(g => g.PlayerTwo)
+            .SingleOrDefaultAsync(g => g.Identifier == identifier);
 
         if (game is null)
         {
@@ -74,7 +78,7 @@ public class GameController(ApplicationDbContext context, ILogger<GameController
         try
         {
             var game = await service.CreateGame(creator!, request);
-            return CreatedAtAction("GetGame", new { id = game.Id }, game.AsResponse());
+            return CreatedAtAction("GetGame", new { identifier = game.Identifier }, game.AsResponse());
         }
         catch (BadHttpRequestException)
         {

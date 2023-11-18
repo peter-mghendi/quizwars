@@ -5,6 +5,8 @@ namespace QuizWars.Models;
 public class Game
 {
     public long Id { get; set; }
+    
+    public required Guid Identifier { get; set; }
 
     public required Topic Topic { get; set; }
 

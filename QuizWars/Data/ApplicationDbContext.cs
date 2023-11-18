@@ -34,6 +34,10 @@ public class ApplicationDbContext
         modelBuilder.Entity<Response>().HasOne(e => e.Choice);
         
         modelBuilder.Entity<Game>()
+            .HasIndex(e => e.Identifier)
+            .IsUnique();
+        
+        modelBuilder.Entity<Game>()
             .HasMany(e => e.Rounds)
             .WithOne(e => e.Game);
         

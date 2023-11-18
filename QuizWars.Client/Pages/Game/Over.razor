@@ -1,0 +1,92 @@
+@page "/game/{Identifier:guid}/over"
+@using QuizWars.Shared.Models.Response
+@using QuizWars.Sdk
+@using QuizWars.Client.Extensions
+
+@inject QuizWarsClient QuizWars
+
+<PageTitle>Game Over</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudStack>
+        @if (Game is null)
+        {
+            <MudText>Loading...</MudText>
+        }
+        else
+        {
+            <MudCard Class="rounded-lg">
+                <MudCardMedia Image="@Game.Topic.GetImageUrl()"/>
+                <MudCardContent>
+                    <MudStack AlignItems="AlignItems.Center">
+                        <MudText Typo="Typo.h4">@Game.Topic.Title</MudText>
+                        <MudText>@Game.Topic.Description</MudText>
+                        <MudText Class="mb-4">@(Game.PlayerOne.Email) vs @(Game.PlayerTwo.Email)</MudText>
+                        <MudText Typo="Typo.caption" Style="color: var(--mud-palette-text-secondary)">@Game.Identifier</MudText>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+
+            @foreach (var round in Rounds)
+            {
+                <MudCard Class="rounded-lg">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h5">@(round.Index + 1)/7: @(round.Question.Text)</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudRadioGroup SelectedOption="@Answer(round)" ReadOnly>
+                            <MudStack>
+                                @foreach (var choice in @round.Question.Choices)
+                                {
+                                    <MudRadio Color="@(IsAnswer(round, choice) ? Color.Success : Color.Default)"
+                                              Option="@choice.Id">
+                                        <MudText Color="@(IsAnswer(round, choice) ? Color.Success : Color.Default)"
+                                                 Class="me-2" Style="vertical-align: middle" Inline>
+                                            @choice.Text
+                                        </MudText>
+
+                                        @* O(n²) :( *@
+                                        @foreach (var response in round.Responses.Where(response => choice.Id == response.Choice?.Id))
+                                        {
+                                            <MudChip Color="@(IsAnswer(round, choice) ? Color.Success : Color.Error)"
+                                                     Variant="@Variant.Text">
+                                                @response.User.Email
+                                            </MudChip>
+                                        }
+                                    </MudRadio>
+                                }
+                            </MudStack>
+                        </MudRadioGroup>
+                    </MudCardContent>
+                </MudCard>
+            }
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+
+    [Parameter]
+    public Guid Identifier { get; set; }
+
+    private GameResponse? Game { get; set; }
+
+    private List<RoundResponse> Rounds { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        Game = await QuizWars.Games.GetGame(Identifier);
+        Rounds = await QuizWars.Rounds.GetRounds(Identifier);
+    }
+
+    private static bool IsAnswer(RoundResponse round, ChoiceResponse choice)
+    {
+        return Answer(round) == choice.Id;
+    }
+
+    private static long Answer(RoundResponse round)
+    {
+        return round.Question.Choices.Single(c => c.IsCorrect).Id;
+    }
+
+}
