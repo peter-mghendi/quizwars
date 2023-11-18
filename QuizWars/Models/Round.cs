@@ -6,7 +6,7 @@ public class Round
 
     public int Index { get; set; }
 
-    public required Game Game { get; set; }
+    public Game Game { get; set; } = null!;
 
     public required Question Question { get; set; }
 

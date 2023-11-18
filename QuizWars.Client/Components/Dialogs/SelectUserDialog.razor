@@ -1,0 +1,38 @@
+@using QuizWars.Sdk
+
+@inject QuizWarsClient QuizWars
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Rounded.PersonSearch" Class="mr-3 mb-n1"/>
+            Select Opponent
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudList Clickable="true" SelectedItemChanged="Challenge">
+            @foreach (var user in Users)
+            {
+                <MudListItem Text="@user.Email" Avatar="@Icons.Material.Filled.Person" Value="user"/>
+            }
+        </MudList>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    public List<UserInfo> Users { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Users = await QuizWars.Users.GetUsers();
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void Challenge(MudListItem item) => MudDialog.Close(DialogResult.Ok(item.Value as UserInfo));
+}

@@ -9,6 +9,7 @@ using QuizWars.Components;
 using QuizWars.Components.Account;
 using QuizWars.Data;
 using QuizWars.Models.Configuration;
+using QuizWars.Sdk;
 using QuizWars.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +29,7 @@ var connectionString = new NpgsqlConnectionStringBuilder
 }.ToString();
 
 // Add services to the container.
+builder.Services.AddControllersWithViews();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
@@ -52,9 +54,18 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
+builder.Services.AddHttpClient("QuizWars.ServerAPI", client => client.BaseAddress = new Uri("http://localhost:5202"));
+
+// Supply HttpClient instances that include access tokens when making requests to the server project
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("QuizWars.ServerAPI"));
+builder.Services.AddScoped(sp => new QuizWarsClient(sp.GetRequiredService<HttpClient>()));
+
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityMailKitEmailSender>();
+
+builder.Services.AddScoped<GameService>();
+
 builder.Services.AddMudServices();
 
 var app = builder.Build();
@@ -72,7 +83,7 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
@@ -80,7 +91,9 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(Counter).Assembly);
+    .AddAdditionalAssemblies(typeof(Home).Assembly);
+
+app.MapControllers();
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();

@@ -1,6 +1,8 @@
 ﻿@inherits LayoutComponentBase
 
 <MudThemeProvider IsDarkMode="true"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
 
 <MudLayout>
     <MudAppBar Elevation="0">
@@ -30,9 +32,9 @@
             </AuthorizeView>
         </MudNavMenu>
     </MudDrawer>
-    <MudMainContent Class="mud-height-full" Style="background-color: var(--mud-palette-background-grey);">
+    <MudMainContent Class="mud-height-full" Style="background-color: var(--mud-palette-background-grey)">
         <div class="pa-4 mud-height-full">
-            <div class="pa-8 mud-height-full rounded-xl" Style="background-color: var(--mud-palette-background)">
+            <div class="pa-8 rounded-xl mud-height-full overflow-y-scroll" Style="background-color: var(--mud-palette-background)">
                 @Body
             </div>
         </div>

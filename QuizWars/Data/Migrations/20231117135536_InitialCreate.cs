@@ -177,7 +177,6 @@ namespace QuizWars.Data.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Text = table.Column<string>(type: "text", nullable: false),
                     TopicId = table.Column<long>(type: "bigint", nullable: false),
                     PlayerOneId = table.Column<string>(type: "text", nullable: true),
                     PlayerTwoId = table.Column<string>(type: "text", nullable: false)

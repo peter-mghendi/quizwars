@@ -258,10 +258,6 @@ namespace QuizWars.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<long>("TopicId")
                         .HasColumnType("bigint");
 
