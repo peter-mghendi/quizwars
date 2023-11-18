@@ -33,3 +33,9 @@
 .search .mud-input.mud-input-underline {
     border-radius: 24px;
 }
+
+/* Likely not a good idea */
+
+::-webkit-scrollbar {
+    display: none;
+}
