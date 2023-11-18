@@ -26,6 +26,7 @@ public static class ResponseExtensions
     public static ResponseResponse AsResponse(this Response response) => new(
         response.Id,
         response.TimeLeft,
+        response.Points,
         response.Choice?.AsResponse(),
         response.User.AsUserInfo()
     );

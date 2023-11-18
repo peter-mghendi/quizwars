@@ -21,7 +21,28 @@
                     <MudStack AlignItems="AlignItems.Center">
                         <MudText Typo="Typo.h4">@Game.Topic.Title</MudText>
                         <MudText>@Game.Topic.Description</MudText>
-                        <MudText Class="mb-4">@(Game.PlayerOne.Email) vs @(Game.PlayerTwo.Email)</MudText>
+                        <MudGrid Class="mb-4">
+                            <MudItem xs="6">
+                                <MudPaper Class="pa-4" Elevation="0">
+                                    <MudStack AlignItems="AlignItems.Center">
+                                        <MudText>@Game.PlayerOne.Email</MudText>
+                                        <MudText Typo="Typo.h4">
+                                            @CalculatePoints(Rounds, Game.PlayerOne)
+                                        </MudText>
+                                    </MudStack>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MudPaper Class="pa-4" Elevation="0">
+                                    <MudStack AlignItems="AlignItems.Center">
+                                        <MudText>@Game.PlayerTwo.Email</MudText>
+                                        <MudText Typo="Typo.h4">
+                                            @CalculatePoints(Rounds, Game.PlayerTwo)
+                                        </MudText>
+                                    </MudStack>
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
                         <MudText Typo="Typo.caption" Style="color: var(--mud-palette-text-secondary)">@Game.Identifier</MudText>
                     </MudStack>
                 </MudCardContent>
@@ -89,4 +110,11 @@
         return round.Question.Choices.Single(c => c.IsCorrect).Id;
     }
 
+    private static int CalculatePoints(List<RoundResponse> rounds, UserInfo user)
+    {
+        return rounds
+            .SelectMany(r => r.Responses)
+            .Where(r => r.User.Email == user.Email)
+            .Sum(r => r.Points);
+    }
 }

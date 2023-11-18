@@ -12,7 +12,7 @@ using QuizWars.Data;
 namespace QuizWars.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231118195004_InitialCreate")]
+    [Migration("20231118215059_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -314,10 +314,13 @@ namespace QuizWars.Data.Migrations
                     b.Property<long?>("ChoiceId")
                         .HasColumnType("bigint");
 
+                    b.Property<int>("Points")
+                        .HasColumnType("integer");
+
                     b.Property<long>("RoundId")
                         .HasColumnType("bigint");
 
-                    b.Property<int?>("TimeLeft")
+                    b.Property<int>("TimeLeft")
                         .HasColumnType("integer");
 
                     b.Property<string>("UserId")

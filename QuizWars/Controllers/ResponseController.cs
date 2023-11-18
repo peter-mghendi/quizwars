@@ -78,6 +78,7 @@ public class ResponseController(ApplicationDbContext context, UserManager<Applic
         var response = new Response
         {
             TimeLeft = request.TimeLeft,
+            Points = CalculatePoints(round, choice, request.TimeLeft),
             Choice = choice,
             User = user!,
             Round = round,
@@ -104,4 +105,17 @@ public class ResponseController(ApplicationDbContext context, UserManager<Applic
         .ThenInclude(r => r.Responses)
         .ThenInclude(r => r.User)
         .SingleOrDefaultAsync(g => g.Identifier == identifier);
+
+    
+
+    private static int CalculatePoints(Round round, Choice? choice, int time)
+    {
+        if (choice is null or { IsCorrect: false })
+        {
+            return 0;
+        }
+        
+        var points = time + 10;
+        return round.Index + 1 == 7 ? points * 2 : points;
+    }
 }
