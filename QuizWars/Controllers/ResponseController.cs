@@ -69,7 +69,7 @@ public class ResponseController(ApplicationDbContext context, UserManager<Applic
         }
 
         var choice = round.Question.Choices.SingleOrDefault(c => c.Id == request.ChoiceId);
-        if (choice is null)
+        if (choice is null && request.ChoiceId is not 0)
         {
             return BadRequest();
         }
@@ -77,7 +77,7 @@ public class ResponseController(ApplicationDbContext context, UserManager<Applic
         var user = await manager.FindByEmailAsync(email);
         var response = new Response
         {
-            Duration = request.Duration,
+            TimeLeft = request.TimeLeft,
             Choice = choice,
             User = user!,
             Round = round,

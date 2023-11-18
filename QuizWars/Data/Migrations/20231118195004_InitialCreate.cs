@@ -278,9 +278,9 @@ namespace QuizWars.Data.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Duration = table.Column<int>(type: "integer", nullable: true),
-                    UserId = table.Column<string>(type: "text", nullable: true),
+                    TimeLeft = table.Column<int>(type: "integer", nullable: true),
                     ChoiceId = table.Column<long>(type: "bigint", nullable: true),
+                    UserId = table.Column<string>(type: "text", nullable: true),
                     RoundId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>

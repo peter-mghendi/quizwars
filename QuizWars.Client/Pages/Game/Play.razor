@@ -3,9 +3,11 @@
 @using QuizWars.Sdk
 @using QuizWars.Client.Extensions
 @using QuizWars.Shared.Models.Request
+@using System.Timers
 
 @inject NavigationManager Navigation
 @inject QuizWarsClient QuizWars
+@inject ISnackbar Snackbar
 
 <PageTitle>Play</PageTitle>
 
@@ -31,6 +33,7 @@ else if (CurrentRound is null)
 else
 {
     <MudCard>
+        <MudProgressLinear Min="0" Max="10" Value="@TimeLeft" Color="ProgressColor"/>
         <MudCardHeader>
             <MudText Typo="Typo.h5">@(Round + 1)/7: @(CurrentRound.Question.Text)</MudText>
         </MudCardHeader>
@@ -55,6 +58,10 @@ else
     
     [Parameter]
     public Guid Identifier { get; set; }
+    
+    private Timer? GameTimer { get; set; }
+
+    private double TimeLeft { get; set; }
 
     private int Round { get; set; }
 
@@ -63,6 +70,13 @@ else
     private GameResponse? Game { get; set; }
 
     private RoundResponse? CurrentRound { get; set; }
+
+    private Color ProgressColor => TimeLeft switch
+    {
+        > 5d => Color.Success,
+        > 3d => Color.Warning,
+        _ => Color.Error
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,9 +87,16 @@ else
 
     private async Task Submit()
     {
-        // TODO: Stop timer.
-        
-        var request = new CreateResponseRequest(SelectedChoiceId, 0); // TODO: // Timer value 
+        if (GameTimer != null)
+        {
+            GameTimer.Stop();
+            GameTimer.Enabled = false;
+            GameTimer.Dispose();
+        }
+
+        var duration = Math.Clamp((int)Math.Round(TimeLeft, 0, MidpointRounding.AwayFromZero), 0, 10);
+        Console.WriteLine($"Selected Choice: {SelectedChoiceId}, Duration: {duration}");
+        var request = new CreateResponseRequest(SelectedChoiceId, (int)duration);
         await QuizWars.Responses.CreateResponse(Identifier, Round, request);
         
         // TODO: UI feedback for correct/wrong answer. 
@@ -95,8 +116,32 @@ else
         CurrentRound = await QuizWars.Rounds.GetRound(Identifier, index);
         Round = CurrentRound.Index;
         SelectedChoiceId = 0;
+
+        SetupTimer();
+
         StateHasChanged();
-        
-        // TODO: Start timer.
+    }
+
+    private void SetupTimer()
+    {
+        TimeLeft = 13d; // 3s extra to read the question
+        GameTimer = new Timer(TimeSpan.FromMilliseconds(100));
+        GameTimer.Elapsed += async (_, _) =>
+        {
+            if (TimeLeft > 0)
+            {
+                TimeLeft -= 0.1d;
+                StateHasChanged();
+            }
+            else
+            {
+                GameTimer.Enabled = false;
+                GameTimer.Dispose();
+
+                Snackbar.Add("Time up!", Severity.Error);
+                await Submit();
+            }
+        };
+        GameTimer.Start();
     }
 }

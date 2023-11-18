@@ -311,11 +311,11 @@ namespace QuizWars.Data.Migrations
                     b.Property<long?>("ChoiceId")
                         .HasColumnType("bigint");
 
-                    b.Property<int?>("Duration")
-                        .HasColumnType("integer");
-
                     b.Property<long>("RoundId")
                         .HasColumnType("bigint");
+
+                    b.Property<int?>("TimeLeft")
+                        .HasColumnType("integer");
 
                     b.Property<string>("UserId")
                         .HasColumnType("text");

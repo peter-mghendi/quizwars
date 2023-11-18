@@ -6,7 +6,7 @@ public class Response
 {
     public long Id { get; set; }
 
-    public int? Duration { get; set; }
+    public int? TimeLeft { get; set; }
 
     public Choice? Choice { get; set; }
     
