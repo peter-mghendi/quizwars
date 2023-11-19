@@ -11,47 +11,51 @@
 
 <PageTitle>Play</PageTitle>
 
-@if (Game is null)
-{
-    <MudText>Loading...</MudText>
-}
-else if (CurrentRound is null)
-{
-    <MudCard Class="rounded-lg">
-        <MudCardMedia Image="@Game.Topic.GetImageUrl()"/>
-        <MudCardContent>
-            <MudStack AlignItems="AlignItems.Center">
-                <MudText Typo="Typo.h4">@Game.Topic.Title</MudText>
-                <MudText>@Game.Topic.Description</MudText>
-                <MudText Class="mb-4">@(Game.PlayerOne.Email) vs @(Game.PlayerTwo.Email)</MudText>
-                <MudButton Class="mb-4" OnClick="@Start">Start!</MudButton>
-                <MudText Typo="Typo.caption" Style="color: var(--mud-palette-text-secondary)">@Game.Identifier</MudText>
-            </MudStack>
-        </MudCardContent>
-    </MudCard>
-}
-else
-{
-    <MudCard>
-        <MudProgressLinear Min="0" Max="10" Value="@TimeLeft" Color="ProgressColor"/>
-        <MudCardHeader>
-            <MudText Typo="Typo.h5">@(Round + 1)/7: @(CurrentRound.Question.Text)</MudText>
-        </MudCardHeader>
-        <MudCardContent>
-            <MudStack>
-                <MudRadioGroup @bind-SelectedOption="@SelectedChoiceId">
-                    <MudStack>
-                        @foreach (var choice in @CurrentRound.Question.Choices)
-                        {
-                            <MudRadio Color="Color.Primary" Option="@choice.Id">@choice.Text</MudRadio>
-                        }
-                    </MudStack>
-                </MudRadioGroup>
-                <MudButton OnClick="@Submit" FullWidth>Submit</MudButton>
-            </MudStack>
-        </MudCardContent>
-    </MudCard>
-}
+<MudContainer MaxWidth="MaxWidth.Large">
+<MudStack>
+    @if (Game is null)
+    {
+        <MudText>Loading...</MudText>
+    }
+    else if (CurrentRound is null)
+    {
+        <MudCard Class="rounded-lg">
+            <MudCardMedia Image="@Game.Topic.GetImageUrl()"/>
+            <MudCardContent>
+                <MudStack AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.h4">@Game.Topic.Title</MudText>
+                    <MudText>@Game.Topic.Description</MudText>
+                    <MudText Class="mb-4">@(Game.PlayerOne.Email) vs @(Game.PlayerTwo.Email)</MudText>
+                    <MudButton Class="mb-4" OnClick="@Start">Start!</MudButton>
+                    <MudText Typo="Typo.caption" Style="color: var(--mud-palette-text-secondary)">@Game.Identifier</MudText>
+                </MudStack>
+            </MudCardContent>
+        </MudCard>
+    }
+    else
+    {
+        <MudCard>
+            <MudProgressLinear Min="0" Max="10" Value="@TimeLeft" Color="ProgressColor"/>
+            <MudCardHeader>
+                <MudText Typo="Typo.h5">@(Round + 1)/@GameRounds: @(CurrentRound.Question.Text)</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudStack>
+                    <MudRadioGroup @bind-SelectedOption="@SelectedChoiceId">
+                        <MudStack>
+                            @foreach (var choice in @CurrentRound.Question.Choices)
+                            {
+                                <MudRadio Color="Color.Primary" Option="@choice.Id">@choice.Text</MudRadio>
+                            }
+                        </MudStack>
+                    </MudRadioGroup>
+                    <MudButton OnClick="@Submit" FullWidth>Submit</MudButton>
+                </MudStack>
+            </MudCardContent>
+        </MudCard>
+    }
+</MudStack>
+</MudContainer>
 
 @code {
     private const int GameRounds = 7;
@@ -96,18 +100,18 @@ else
 
         var duration = Math.Clamp((int)Math.Round(TimeLeft, 0, MidpointRounding.AwayFromZero), 0, 10);
         Console.WriteLine($"Selected Choice: {SelectedChoiceId}, Duration: {duration}");
-        var request = new CreateResponseRequest(SelectedChoiceId, (int)duration);
+        var request = new CreateResponseRequest(SelectedChoiceId, duration);
         await QuizWars.Responses.CreateResponse(Identifier, Round, request);
         
-        // TODO: UI feedback for correct/wrong answer. 
+        // TODO: UI feedback for correct/wrong + opponent answer. 
         
-        if (Round + 1 < 7)
+        if (Round + 1 < GameRounds)
         {
             await LoadRound(Round + 1);
         }
         else
         {
-            Navigation.NavigateTo($"game/{Identifier}/over");
+            Navigation.NavigateTo($"game/{Identifier}/results");
         }
     }
 

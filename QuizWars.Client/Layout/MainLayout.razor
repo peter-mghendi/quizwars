@@ -17,7 +17,12 @@
         </MudDrawerHeader>
         <MudNavMenu Class="ps-4">
             <MudStack>
-                <MudNavLink Href="" Match="NavLinkMatch.All" Class="rounded-pill" Icon="@Icons.Material.Rounded.Home">Home</MudNavLink>
+                <MudNavLink Href="" Match="NavLinkMatch.All" Class="rounded-pill" Icon="@Icons.Material.Rounded.Home">
+                    Home
+                </MudNavLink>
+                <MudNavLink Href="inbox" Class="rounded-pill" Icon="@Icons.Material.Rounded.Notifications">
+                    <MudBadge Color="Color.Primary" Visible Dot>Inbox</MudBadge>
+                </MudNavLink>
                 <AuthorizeView>
                     <Authorized>
                         <MudNavLink Href="Account/Manage" Match="NavLinkMatch.All" Class="rounded-pill" Icon="@Icons.Material.Rounded.Person">@context.User.Identity?.Name</MudNavLink>

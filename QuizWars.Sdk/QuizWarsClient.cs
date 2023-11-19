@@ -6,6 +6,8 @@ public class QuizWarsClient(HttpClient client)
 {
     public GameService Games => new(client);
 
+    public NotificationService Notifications => new(client);
+
     public ResponseService Responses => new(client);
 
     public RoundService Rounds => new(client);

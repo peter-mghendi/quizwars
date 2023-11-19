@@ -15,12 +15,12 @@ public class UserController(UserManager<ApplicationUser> manager) : ControllerBa
 {
     // GET: api/users
     [HttpGet]
-    public async Task<List<UserInfo>> GetUsers()
+    public async Task<IEnumerable<UserInfo>> GetUsers()
     {
         Console.WriteLine(User.Identity!.Name);
         return await manager.Users
             .Where(u => u.Email != User.Identity!.Name)
-            .Select(user => user.AsUserInfo())
+            .Select(u => u.AsUserInfo())
             .ToListAsync();
     }
 

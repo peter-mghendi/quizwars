@@ -225,6 +225,34 @@ namespace QuizWars.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Action = table.Column<int>(type: "integer", nullable: false),
+                    SentAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    ReadAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    GameId = table.Column<long>(type: "bigint", nullable: false),
+                    RecipientId = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_AspNetUsers_RecipientId",
+                        column: x => x.RecipientId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_Games_GameId",
+                        column: x => x.GameId,
+                        principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Choices",
                 columns: table => new
                 {
@@ -369,6 +397,16 @@ namespace QuizWars.Data.Migrations
                 column: "TopicId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Notifications_GameId",
+                table: "Notifications",
+                column: "GameId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_RecipientId",
+                table: "Notifications",
+                column: "RecipientId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Questions_TopicId",
                 table: "Questions",
                 column: "TopicId");
@@ -416,6 +454,9 @@ namespace QuizWars.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "Responses");

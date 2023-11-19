@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QuizWars.Data;
 using QuizWars.Models;
+using QuizWars.Shared.Models.Enum;
 using QuizWars.Shared.Models.Request;
 using static System.Guid;
 
@@ -43,9 +44,18 @@ public class GameService(ApplicationDbContext context, UserManager<ApplicationUs
             Rounds = rounds
         };
 
+        var notification = new Notification
+        {
+            Action = NotificationAction.Play,
+            SentAt = DateTimeOffset.UtcNow,
+            Game = game,
+            Recipient = opponent
+        };
+        
         context.Games.Add(game);
+        context.Notifications.Add(notification);
         await context.SaveChangesAsync();
-
+        
         return game;
     }
 }

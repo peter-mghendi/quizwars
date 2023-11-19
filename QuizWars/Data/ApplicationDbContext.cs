@@ -13,6 +13,8 @@ public class ApplicationDbContext
 
     public DbSet<Game> Games => Set<Game>();
 
+    public DbSet<Notification> Notifications => Set<Notification>();
+
     public DbSet<Question> Questions => Set<Question>();
     
     public DbSet<Response> Responses => Set<Response>();

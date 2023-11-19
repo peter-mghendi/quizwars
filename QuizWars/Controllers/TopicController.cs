@@ -16,9 +16,9 @@ public class TopicController(ApplicationDbContext context) : ControllerBase
     // GET: api/topics
     [HttpGet]
     [AllowAnonymous]
-    public async Task<List<TopicResponse>> GetTopics()
+    public async Task<IEnumerable<TopicResponse>> GetTopics()
     {
-        return await context.Topics.Select(topic => topic.AsResponse()).ToListAsync();
+        return await context.Topics.Select(t => t.AsResponse()).ToListAsync();
     }
 
     // GET: api/topics/5

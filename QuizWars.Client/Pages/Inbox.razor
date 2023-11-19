@@ -1,0 +1,47 @@
+@page "/inbox"
+@using Microsoft.AspNetCore.Authorization
+@using QuizWars.Sdk
+@using QuizWars.Shared.Models.Response
+
+@attribute [Authorize]
+
+@inject NavigationManager Navigation
+@inject QuizWarsClient QuizWars
+
+<PageTitle>Notifications</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudStack>
+        @foreach (var notification in Notifications)
+        {
+            <MudCard>
+                <MudCardHeader>
+                    <MudBadge Color="Color.Primary"  Visible="@(!notification.IsRead)" Dot>
+                        <MudText Typo="Typo.caption">@notification.SentAt</MudText>
+                    </MudBadge>
+                </MudCardHeader>
+                <MudCardContent>@notification.Text</MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await Go(notification))">
+                        Go!
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private List<NotificationResponse> Notifications { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        Notifications = await QuizWars.Notifications.GetNotifications();
+    }
+
+    private async Task Go(NotificationResponse notification)
+    {
+        await QuizWars.Notifications.MarkNotificationRead(notification.Id);
+        Navigation.NavigateTo(notification.Url);
+    }
+}

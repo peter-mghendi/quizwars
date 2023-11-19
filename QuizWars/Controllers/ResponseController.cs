@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using QuizWars.Data;
 using QuizWars.Extensions;
 using QuizWars.Models;
+using QuizWars.Shared.Models.Enum;
 using QuizWars.Shared.Models.Request;
 using QuizWars.Shared.Models.Response;
 
@@ -15,25 +16,6 @@ namespace QuizWars.Controllers;
 [Route("api/games/{identifier}/rounds/{index}/responses")]
 public class ResponseController(ApplicationDbContext context, UserManager<ApplicationUser> manager) : ControllerBase
 {
-    // GET: api/games/0085f04e-8a30-449e-91e1-38899b4d3ed5/rounds/3/responses
-    // [HttpGet]
-    // public async Task<ActionResult<IEnumerable<ResponseResponse>>> GetRound(Guid identifier, int index)
-    // {
-    //     var game = await GetGameAsync(identifier);
-    //     if (game is null)
-    //     {
-    //         return NotFound();
-    //     }
-    //
-    //     var round = game.Rounds.SingleOrDefault(r => r.Index == index);
-    //     if (round is null)
-    //     {
-    //         return BadRequest();
-    //     }
-    //
-    //     return round.Responses.Select(r => r.AsResponse()).ToList();
-    // }
-
     // POST: api/games/0085f04e-8a30-449e-91e1-38899b4d3ed5/rounds/3/responses
     [HttpPost]
     public async Task<ActionResult<IEnumerable<ResponseResponse>>> PostResponse(
@@ -83,8 +65,21 @@ public class ResponseController(ApplicationDbContext context, UserManager<Applic
             User = user!,
             Round = round,
         };
-
+        
         round.Responses.Add(response);
+
+        if (round.Index is 6 && email == game.PlayerTwo.Email)
+        {
+            var notification = new Notification
+            {
+                Action = NotificationAction.Results,
+                SentAt = DateTimeOffset.UtcNow,
+                Game = game,
+                Recipient = game.PlayerOne
+            };
+            context.Notifications.Add(notification);
+        }
+        
         await context.SaveChangesAsync();
 
         // User has responded, do not obfuscate the response.

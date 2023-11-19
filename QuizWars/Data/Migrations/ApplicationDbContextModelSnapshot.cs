@@ -278,6 +278,38 @@ namespace QuizWars.Data.Migrations
                     b.ToTable("Games");
                 });
 
+            modelBuilder.Entity("QuizWars.Models.Notification", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Action")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("GameId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("ReadAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RecipientId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("RecipientId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("QuizWars.Models.Question", b =>
                 {
                     b.Property<long>("Id")
@@ -466,6 +498,23 @@ namespace QuizWars.Data.Migrations
                     b.Navigation("PlayerTwo");
 
                     b.Navigation("Topic");
+                });
+
+            modelBuilder.Entity("QuizWars.Models.Notification", b =>
+                {
+                    b.HasOne("QuizWars.Models.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QuizWars.Data.ApplicationUser", "Recipient")
+                        .WithMany()
+                        .HasForeignKey("RecipientId");
+
+                    b.Navigation("Game");
+
+                    b.Navigation("Recipient");
                 });
 
             modelBuilder.Entity("QuizWars.Models.Question", b =>

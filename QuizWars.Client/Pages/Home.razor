@@ -4,6 +4,9 @@
 @using QuizWars.Client.Components.Dialogs
 @using QuizWars.Client.Extensions
 @using QuizWars.Shared.Models.Request
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
 
 @inject IDialogService DialogService
 @inject NavigationManager Navigation
@@ -20,7 +23,7 @@
                 <MudCardHeader>@topic.Title</MudCardHeader>
                 <MudCardContent>@topic.Description</MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async  () => await Play(topic))">
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await Play(topic))">
                         Play!
                     </MudButton>
                     <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Error"/>
@@ -33,19 +36,12 @@
 
 @code
 {
-    
+
     private List<TopicResponse> Topics { get; set; } = [];
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            Topics = await QuizWars.Topics.GetTopics();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Unable to fetch categories: {e.Message}. \n{e.StackTrace}");
-        }
+        Topics = await QuizWars.Topics.GetTopics();
     }
 
     private async Task Play(TopicResponse topic)
@@ -55,10 +51,10 @@
         {
             return;
         }
-        
+
         var request = new CreateGameRequest(topic.Id, opponent.UserId);
         var game = await QuizWars.Games.CreateGame(request);
-        
+
         Navigation.NavigateTo($"game/{game.Identifier}/play");
     }
 
@@ -68,5 +64,5 @@
         var result = await dialog.Result;
         return result.Data as UserInfo;
     }
-    
+
 }

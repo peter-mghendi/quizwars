@@ -17,6 +17,17 @@ public static class ResponseExtensions
         game.PlayerTwo.AsUserInfo()
     );
 
+    public static NotificationResponse AsResponse(this Notification notification)
+    {
+        return new NotificationResponse(
+            notification.Id,
+            notification.Action,
+            notification.SentAt,
+            notification.ReadAt,
+            notification.Game.AsResponse()
+        );
+    }
+
     public static QuestionResponse AsResponse(this Question question) => new(
         question.Id,
         question.Text,
