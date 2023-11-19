@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using Npgsql;
@@ -8,6 +9,7 @@ using QuizWars.Client.Pages;
 using QuizWars.Components;
 using QuizWars.Components.Account;
 using QuizWars.Data;
+using QuizWars.Hubs;
 using QuizWars.Models.Configuration;
 using QuizWars.Sdk;
 using QuizWars.Services;
@@ -54,6 +56,11 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
+});
+
 builder.Services.AddHttpClient("QuizWars.ServerAPI", client => client.BaseAddress = new Uri("http://localhost:5202"));
 
 // Supply HttpClient instances that include access tokens when making requests to the server project
@@ -71,6 +78,7 @@ builder.Services.AddMudServices();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseResponseCompression();
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
@@ -94,6 +102,7 @@ app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(Home).Assembly);
 
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notification");
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();

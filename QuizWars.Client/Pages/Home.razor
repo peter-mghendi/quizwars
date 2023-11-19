@@ -5,8 +5,11 @@
 @using QuizWars.Client.Extensions
 @using QuizWars.Shared.Models.Request
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.SignalR.Client
 
 @attribute [Authorize]
+
+@implements IAsyncDisposable
 
 @inject IDialogService DialogService
 @inject NavigationManager Navigation
@@ -37,11 +40,23 @@
 @code
 {
 
-    private List<TopicResponse> Topics { get; set; } = [];
+    private HubConnection? _hub;
+    private List<TopicResponse> Topics { get; set; } =
+
+    []
+    ;
 
     protected override async Task OnInitializedAsync()
     {
         Topics = await QuizWars.Topics.GetTopics();
+
+        _hub = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/hubs/notification"))
+            .Build();
+
+        _hub.On<NotificationResponse>("ReceiveNotification", ShowNotification);
+
+        await _hub.StartAsync();
     }
 
     private async Task Play(TopicResponse topic)
@@ -65,4 +80,14 @@
         return result.Data as UserInfo;
     }
 
+    private async Task ShowNotification(NotificationResponse notification)
+    {
+        var parameters = new DialogParameters<NotificationDialog> { { x => x.Notification, notification } };
+        await DialogService.ShowAsync<NotificationDialog>("Notification", parameters);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hub != null) await _hub.DisposeAsync();
+    }
 }

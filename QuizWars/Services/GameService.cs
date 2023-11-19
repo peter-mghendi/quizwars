@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using QuizWars.Data;
+using QuizWars.Extensions;
+using QuizWars.Hubs;
+using QuizWars.Hubs.Clients;
 using QuizWars.Models;
 using QuizWars.Shared.Models.Enum;
 using QuizWars.Shared.Models.Request;
@@ -8,7 +12,11 @@ using static System.Guid;
 
 namespace QuizWars.Services;
 
-public class GameService(ApplicationDbContext context, UserManager<ApplicationUser> manager)
+public class GameService(
+    ApplicationDbContext context,
+    IHubContext<NotificationHub, INotificationHubClient> hub,
+    UserManager<ApplicationUser> manager
+)
 {
     private const int GameRounds = 7;
 
@@ -17,7 +25,7 @@ public class GameService(ApplicationDbContext context, UserManager<ApplicationUs
         var topic = await context.Topics
             .Include(t => t.Questions)
             .SingleOrDefaultAsync(t => t.Id == request.TopicId);
-        
+
         if (topic is null)
         {
             throw new BadHttpRequestException("Topic not found.");
@@ -51,11 +59,12 @@ public class GameService(ApplicationDbContext context, UserManager<ApplicationUs
             Game = game,
             Recipient = opponent
         };
-        
+
         context.Games.Add(game);
         context.Notifications.Add(notification);
         await context.SaveChangesAsync();
-        
+        await hub.Clients.User(notification.Recipient.Id).ReceiveNotification(notification.AsResponse());
+
         return game;
     }
 }

@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using QuizWars.Data;
 using QuizWars.Extensions;
+using QuizWars.Hubs;
+using QuizWars.Hubs.Clients;
 using QuizWars.Models;
 using QuizWars.Shared.Models.Enum;
 using QuizWars.Shared.Models.Request;
@@ -14,7 +17,11 @@ namespace QuizWars.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/games/{identifier}/rounds/{index}/responses")]
-public class ResponseController(ApplicationDbContext context, UserManager<ApplicationUser> manager) : ControllerBase
+public class ResponseController(
+    ApplicationDbContext context,
+    IHubContext<NotificationHub, INotificationHubClient> hub,
+    UserManager<ApplicationUser> manager
+) : ControllerBase
 {
     // POST: api/games/0085f04e-8a30-449e-91e1-38899b4d3ed5/rounds/3/responses
     [HttpPost]
@@ -65,7 +72,7 @@ public class ResponseController(ApplicationDbContext context, UserManager<Applic
             User = user!,
             Round = round,
         };
-        
+
         round.Responses.Add(response);
 
         if (round.Index is 6 && email == game.PlayerTwo.Email)
@@ -78,8 +85,9 @@ public class ResponseController(ApplicationDbContext context, UserManager<Applic
                 Recipient = game.PlayerOne
             };
             context.Notifications.Add(notification);
+            await hub.Clients.User(notification.Recipient.Id).ReceiveNotification(notification.AsResponse());
         }
-        
+
         await context.SaveChangesAsync();
 
         // User has responded, do not obfuscate the response.
@@ -101,7 +109,6 @@ public class ResponseController(ApplicationDbContext context, UserManager<Applic
         .ThenInclude(r => r.User)
         .SingleOrDefaultAsync(g => g.Identifier == identifier);
 
-    
 
     private static int CalculatePoints(Round round, Choice? choice, int time)
     {
@@ -109,7 +116,7 @@ public class ResponseController(ApplicationDbContext context, UserManager<Applic
         {
             return 0;
         }
-        
+
         var points = time + 10;
         return round.Index + 1 == 7 ? points * 2 : points;
     }
