@@ -1,3 +1,4 @@
+using Howler.Blazor.Components;
 using QuizWars.Client;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
@@ -17,5 +18,8 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddSingleton<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
 builder.Services.AddMudServices();
+
+builder.Services.AddScoped<IHowl, Howl>();
+builder.Services.AddScoped<IHowlGlobal, HowlGlobal>();
 
 await builder.Build().RunAsync();

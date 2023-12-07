@@ -6,12 +6,14 @@
 @using QuizWars.Shared.Models.Request
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.SignalR.Client
+@using Howler.Blazor.Components
 
 @attribute [Authorize]
 
 @implements IAsyncDisposable
 
 @inject IDialogService DialogService
+@inject IHowl Howl
 @inject NavigationManager Navigation
 @inject QuizWarsClient QuizWars
 
@@ -41,10 +43,7 @@
 {
 
     private HubConnection? _hub;
-    private List<TopicResponse> Topics { get; set; } =
-
-    []
-    ;
+    private List<TopicResponse> Topics { get; set; } = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -82,6 +81,8 @@
 
     private async Task ShowNotification(NotificationResponse notification)
     {
+        await Howl.Play($"/audio/notification.mp3");
+        
         var parameters = new DialogParameters<NotificationDialog> { { x => x.Notification, notification } };
         await DialogService.ShowAsync<NotificationDialog>("Notification", parameters);
     }
