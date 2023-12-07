@@ -18,7 +18,7 @@ public class GameService(
     UserManager<ApplicationUser> manager
 )
 {
-    private const int GameRounds = 7;
+    public const int GameRounds = 7;
 
     public async Task<Game> CreateGame(ApplicationUser creator, CreateGameRequest request)
     {

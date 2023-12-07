@@ -52,7 +52,7 @@
             {
                 <MudCard Class="rounded-lg">
                     <MudCardHeader>
-                        <MudText Typo="Typo.h5">@(round.Index + 1)/7: @(round.Question.Text)</MudText>
+                        <MudText Typo="Typo.h5">@(round.Index + 1)/@(Rounds.Count): @(round.Question.Text)</MudText>
                     </MudCardHeader>
                     <MudCardContent>
                         <MudRadioGroup SelectedOption="@Answer(round)" ReadOnly>

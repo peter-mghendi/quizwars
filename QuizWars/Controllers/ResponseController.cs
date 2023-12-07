@@ -8,6 +8,7 @@ using QuizWars.Extensions;
 using QuizWars.Hubs;
 using QuizWars.Hubs.Clients;
 using QuizWars.Models;
+using QuizWars.Services;
 using QuizWars.Shared.Models.Enum;
 using QuizWars.Shared.Models.Request;
 using QuizWars.Shared.Models.Response;
@@ -118,6 +119,6 @@ public class ResponseController(
         }
 
         var points = time + 10;
-        return round.Index + 1 == 7 ? points * 2 : points;
+        return round.Index + 1 == GameService.GameRounds ? points * 2 : points;
     }
 }

@@ -37,7 +37,7 @@
         <MudCard>
             <MudProgressLinear Min="0" Max="10" Value="@TimeLeft" Color="ProgressColor"/>
             <MudCardHeader>
-                <MudText Typo="Typo.h5">@(Round + 1)/@GameRounds: @(CurrentRound.Question.Text)</MudText>
+                <MudText Typo="Typo.h5">@(CurrentRound.Index + 1)/@GameRounds: @(CurrentRound.Question.Text)</MudText>
             </MudCardHeader>
             <MudCardContent>
                 <MudStack>
@@ -67,8 +67,6 @@
 
     private double TimeLeft { get; set; }
 
-    private int Round { get; set; }
-
     private long SelectedChoiceId { get; set; }
 
     private GameResponse? Game { get; set; }
@@ -87,27 +85,33 @@
         Game = await QuizWars.Games.GetGame(Identifier);
     }
 
-    private async Task Start() => await LoadRound(Round);
+    private async Task Start() => await LoadRound(index: 0);
 
     private async Task Submit()
     {
-        if (GameTimer != null)
-        {
-            GameTimer.Stop();
-            GameTimer.Enabled = false;
-            GameTimer.Dispose();
-        }
+        if (CurrentRound is null) return;
+        
+        DisposeTimer();
+        
+        await SendResponse();
+        await ShowNextScreen();
+    }
 
-        var duration = Math.Clamp((int)Math.Round(TimeLeft, 0, MidpointRounding.AwayFromZero), 0, 10);
-        Console.WriteLine($"Selected Choice: {SelectedChoiceId}, Duration: {duration}");
-        var request = new CreateResponseRequest(SelectedChoiceId, duration);
-        await QuizWars.Responses.CreateResponse(Identifier, Round, request);
+    // TODO: UI feedback for correct/wrong + opponent answer.
+    private async Task SendResponse()
+    {
+        var time = Math.Clamp((int)Math.Round(TimeLeft, 0, MidpointRounding.AwayFromZero), 0, 10);
+        var request = new CreateResponseRequest(SelectedChoiceId, time);
         
-        // TODO: UI feedback for correct/wrong + opponent answer. 
-        
-        if (Round + 1 < GameRounds)
+        Console.WriteLine($"Response: {request}");
+        await QuizWars.Responses.CreateResponse(Identifier, CurrentRound!.Index, request);
+    }
+
+    private async Task ShowNextScreen()
+    {
+        if (CurrentRound!.Index + 1 < GameRounds)
         {
-            await LoadRound(Round + 1);
+            await LoadRound(CurrentRound.Index + 1);
         }
         else
         {
@@ -118,11 +122,9 @@
     private async Task LoadRound(int index)
     {
         CurrentRound = await QuizWars.Rounds.GetRound(Identifier, index);
-        Round = CurrentRound.Index;
         SelectedChoiceId = 0;
 
         SetupTimer();
-
         StateHasChanged();
     }
 
@@ -139,13 +141,20 @@
             }
             else
             {
-                GameTimer.Enabled = false;
-                GameTimer.Dispose();
-
+                DisposeTimer();
                 Snackbar.Add("Time up!", Severity.Error);
                 await Submit();
             }
         };
         GameTimer.Start();
+    }
+
+    private void DisposeTimer()
+    {
+        if (GameTimer == null) return;
+        
+        GameTimer.Stop();
+        GameTimer.Enabled = false;
+        GameTimer.Dispose();
     }
 }
