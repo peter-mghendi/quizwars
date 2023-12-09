@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuizWars.Data;
 using QuizWars.Extensions;
 using QuizWars.Models;
+using QuizWars.Shared.Models;
+using QuizWars.Shared.Models.Request;
 using QuizWars.Shared.Models.Response;
 
 namespace QuizWars.Controllers;
@@ -11,7 +14,7 @@ namespace QuizWars.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/notifications")]
-public class NotificationController(ApplicationDbContext context) : ControllerBase
+public class NotificationController(ApplicationDbContext context, UserManager<ApplicationUser> manager) : ControllerBase
 {
     // GET: api/notifications
     [HttpGet]
@@ -33,6 +36,37 @@ public class NotificationController(ApplicationDbContext context) : ControllerBa
 
     // PUT: api/notifications/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    [HttpPut("subscribe")]
+    public async Task<IResult> PutNotification([FromBody] NotificationSubscriptionData data)
+    {
+        // We're storing at most one subscription per user, so delete old ones.
+        // Alternatively, you could let the user register multiple subscriptions from different browsers/devices.
+        var username = User.Identity!.Name;
+        if (username is null)
+        {
+            return Results.Unauthorized();
+        }
+        
+        var oldSubscriptions = context.NotificationSubscriptions.Where(e => e.User.Email == username);
+        context.NotificationSubscriptions.RemoveRange(oldSubscriptions);
+
+        var user = await manager.FindByEmailAsync(username);
+        var subscription = new NotificationSubscription
+        {
+            Url = data.Url!,
+            P256dh = data.P256dh!,
+            Auth = data.Auth!,
+            User = user!
+        };
+        
+        // Store new subscription
+        context.NotificationSubscriptions.Add(subscription);
+        await context.SaveChangesAsync();
+        
+        return Results.Ok(subscription.AsResponse());
+    }
+
+    // PUT: api/notifications/5
     [HttpPut("{id}")]
     public async Task<IActionResult> PutNotification(long id)
     {

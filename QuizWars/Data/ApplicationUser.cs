@@ -9,5 +9,7 @@ public class ApplicationUser : IdentityUser
     public List<Game> CreatedGames { get; } = new();
     
     public List<Game> InvitedGames { get; } = new();
+    
+    public List<NotificationSubscription> NotificationSubscriptions { get; } = new();
 }
 

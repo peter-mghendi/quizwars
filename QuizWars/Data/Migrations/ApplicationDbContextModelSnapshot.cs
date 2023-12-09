@@ -310,6 +310,35 @@ namespace QuizWars.Data.Migrations
                     b.ToTable("Notifications");
                 });
 
+            modelBuilder.Entity("QuizWars.Models.NotificationSubscription", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Auth")
+                        .HasColumnType("text");
+
+                    b.Property<string>("P256dh")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("NotificationSubscriptions");
+                });
+
             modelBuilder.Entity("QuizWars.Models.Question", b =>
                 {
                     b.Property<long>("Id")
@@ -515,6 +544,15 @@ namespace QuizWars.Data.Migrations
                     b.Navigation("Game");
 
                     b.Navigation("Recipient");
+                });
+
+            modelBuilder.Entity("QuizWars.Models.NotificationSubscription", b =>
+                {
+                    b.HasOne("QuizWars.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("QuizWars.Models.Question", b =>

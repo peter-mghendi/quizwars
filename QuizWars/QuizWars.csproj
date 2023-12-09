@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
     <PackageReference Include="MudBlazor" Version="6.11.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-rc.2" />
+    <PackageReference Include="WebPush" Version="1.0.12" />
     <ProjectReference Include="..\QuizWars.Client\QuizWars.Client.csproj" />
     <PackageReference Include="MailKit" Version="4.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.0" />

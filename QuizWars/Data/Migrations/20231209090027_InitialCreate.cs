@@ -172,6 +172,27 @@ namespace QuizWars.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "NotificationSubscriptions",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Url = table.Column<string>(type: "text", nullable: false),
+                    P256dh = table.Column<string>(type: "text", nullable: false),
+                    Auth = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NotificationSubscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_NotificationSubscriptions_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Games",
                 columns: table => new
                 {
@@ -407,6 +428,11 @@ namespace QuizWars.Data.Migrations
                 column: "RecipientId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_NotificationSubscriptions_UserId",
+                table: "NotificationSubscriptions",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Questions_TopicId",
                 table: "Questions",
                 column: "TopicId");
@@ -457,6 +483,9 @@ namespace QuizWars.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Notifications");
+
+            migrationBuilder.DropTable(
+                name: "NotificationSubscriptions");
 
             migrationBuilder.DropTable(
                 name: "Responses");

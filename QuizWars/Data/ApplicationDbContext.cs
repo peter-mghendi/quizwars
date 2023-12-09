@@ -15,6 +15,8 @@ public class ApplicationDbContext
 
     public DbSet<Notification> Notifications => Set<Notification>();
 
+    public DbSet<NotificationSubscription> NotificationSubscriptions => Set<NotificationSubscription>();
+
     public DbSet<Question> Questions => Set<Question>();
     
     public DbSet<Response> Responses => Set<Response>();

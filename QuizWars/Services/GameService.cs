@@ -63,7 +63,10 @@ public class GameService(
         context.Games.Add(game);
         context.Notifications.Add(notification);
         await context.SaveChangesAsync();
-        await hub.Clients.User(notification.Recipient.Id).ReceiveNotification(notification.AsResponse());
+        
+        await context.Entry(opponent).Collection(u => u.NotificationSubscriptions).LoadAsync();
+        await hub.Clients.User(opponent.Id).ReceiveNotification(notification.AsResponse());
+        await PushNotificationService.SendNotificationAsync(notification);
 
         return game;
     }

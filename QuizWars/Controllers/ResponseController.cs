@@ -86,7 +86,10 @@ public class ResponseController(
                 Recipient = game.PlayerOne
             };
             context.Notifications.Add(notification);
+            
+            await context.Entry(game.PlayerOne).Collection(u => u.NotificationSubscriptions).LoadAsync();
             await hub.Clients.User(notification.Recipient.Id).ReceiveNotification(notification.AsResponse());
+            await PushNotificationService.SendNotificationAsync(notification);
         }
 
         await context.SaveChangesAsync();

@@ -7,6 +7,8 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.SignalR.Client
 @using Howler.Blazor.Components
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using QuizWars.Shared.Models
 
 @attribute [Authorize]
 
@@ -14,6 +16,7 @@
 
 @inject IDialogService DialogService
 @inject IHowl Howl
+@inject IJSRuntime JSRuntime
 @inject NavigationManager Navigation
 @inject QuizWarsClient QuizWars
 
@@ -47,6 +50,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _ = RequestNotificationSubscriptionAsync();
         Topics = await QuizWars.Topics.GetTopics();
 
         _hub = new HubConnectionBuilder()
@@ -56,6 +60,22 @@
         _hub.On<NotificationResponse>("ReceiveNotification", ShowNotification);
 
         await _hub.StartAsync();
+    }
+    
+    private async Task RequestNotificationSubscriptionAsync()
+    {
+        var subscription = await JSRuntime.InvokeAsync<NotificationSubscriptionData?>("push.request");
+        if (subscription is not null)
+        {
+            try
+            {
+                await QuizWars.Notifications.Subscribe(subscription);
+            }
+            catch (AccessTokenNotAvailableException ex)
+            {
+                ex.Redirect();
+            }
+        }
     }
 
     private async Task Play(TopicResponse topic)

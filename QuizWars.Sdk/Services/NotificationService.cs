@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using QuizWars.Shared.Models;
 using QuizWars.Shared.Models.Request;
 using QuizWars.Shared.Models.Response;
 
@@ -15,5 +16,11 @@ public class NotificationService(HttpClient client)
     public async Task MarkNotificationRead(long id)
     {
         _ = await client.PutAsync($"api/notifications/{id}", content: null);
+    }
+    
+    public async Task Subscribe(NotificationSubscriptionData data)
+    {
+        var response = await client.PutAsJsonAsync("api/notifications/subscribe", data);
+        response.EnsureSuccessStatusCode();
     }
 }
