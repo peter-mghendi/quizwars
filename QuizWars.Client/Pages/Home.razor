@@ -16,7 +16,7 @@
 
 @inject IDialogService DialogService
 @inject IHowl Howl
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 @inject NavigationManager Navigation
 @inject QuizWarsClient QuizWars
 
@@ -31,7 +31,7 @@
                 <MudCardHeader>@topic.Title</MudCardHeader>
                 <MudCardContent>@topic.Description</MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await Play(topic))">
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(() => Play(topic))">
                         Play!
                     </MudButton>
                     <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Error"/>
@@ -64,7 +64,7 @@
     
     private async Task RequestNotificationSubscriptionAsync()
     {
-        var subscription = await JSRuntime.InvokeAsync<NotificationSubscriptionData?>("push.request");
+        var subscription = await JsRuntime.InvokeAsync<NotificationSubscriptionData?>("push.request");
         if (subscription is not null)
         {
             try
@@ -101,14 +101,14 @@
 
     private async Task ShowNotification(NotificationResponse notification)
     {
-        await Howl.Play($"/audio/notification.mp3");
+        await Howl.Play("/audio/notification.mp3");
         
         var parameters = new DialogParameters<NotificationDialog> { { x => x.Notification, notification } };
         await DialogService.ShowAsync<NotificationDialog>("Notification", parameters);
     }
 
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
-        if (_hub != null) await _hub.DisposeAsync();
+        return _hub?.DisposeAsync() ?? ValueTask.CompletedTask;
     }
 }

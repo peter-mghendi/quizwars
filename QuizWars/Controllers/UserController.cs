@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using QuizWars.Client;
 using QuizWars.Data;
 using QuizWars.Extensions;
+using QuizWars.Shared.Models.Response;
 
 namespace QuizWars.Controllers;
 

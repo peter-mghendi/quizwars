@@ -17,7 +17,7 @@ namespace QuizWars.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("api/games/{identifier}/rounds/{index}/responses")]
+[Route("api/games/{identifier:guid}/rounds/{index:int}/responses")]
 public class ResponseController(
     ApplicationDbContext context,
     IHubContext<NotificationHub, INotificationHubClient> hub,

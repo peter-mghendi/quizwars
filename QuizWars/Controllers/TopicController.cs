@@ -22,7 +22,7 @@ public class TopicController(ApplicationDbContext context) : ControllerBase
     }
 
     // GET: api/topics/5
-    [HttpGet("{id}")]
+    [HttpGet("{id:long}")]
     public async Task<ActionResult<TopicResponse>> GetTopic(long id)
     {
         var topic = await context.Topics.FindAsync(id);
@@ -36,7 +36,7 @@ public class TopicController(ApplicationDbContext context) : ControllerBase
 
     // PUT: api/topics/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    [HttpPut("{id}")]
+    [HttpPut("{id:long}")]
     public async Task<IActionResult> PutTopic(long id, Topic topic)
     {
         if (id != topic.Id)
@@ -70,7 +70,7 @@ public class TopicController(ApplicationDbContext context) : ControllerBase
     }
 
     // DELETE: api/topics/5
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:long}")]
     public async Task<IActionResult> DeleteTopic(long id)
     {
         var topic = await context.Topics.FindAsync(id);

@@ -1,7 +1,6 @@
 using System.Text.Json;
 using QuizWars.Extensions;
 using QuizWars.Models;
-using QuizWars.Shared.Models.Response;
 using WebPush;
 
 namespace QuizWars.Services;
@@ -13,6 +12,8 @@ public static class PushNotificationService
         "BLC8GOevpcpjQiLkO7JmVClQjycvTCYWm6Cq_a7wJZlstGTVZvwGFFHMYfXt6Njyvgx_GlXJeo5cSiZ1y4JOx1o";
 
     private const string PrivateKey = "OrubzSz3yWACscZXjFQrrtDwCKg-TGFuWhluQ2wLXDo";
+    
+    private static readonly JsonSerializerOptions Options = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     public static async Task SendNotificationAsync(Notification notification)
     {
@@ -25,8 +26,7 @@ public static class PushNotificationService
 
         try
         {
-            var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-            var payload = JsonSerializer.Serialize(notification.AsResponse(), options);
+            var payload = JsonSerializer.Serialize(notification.AsResponse(), Options);
             await webPushClient.SendNotificationAsync(pushSubscription, payload, vapidDetails);
         }
         catch (Exception ex)

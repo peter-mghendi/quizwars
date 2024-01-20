@@ -40,7 +40,7 @@ public class GameService(
         var rounds = topic.Questions
             .OrderBy(_ => Random.Shared.Next())
             .Take(GameRounds)
-            .Select((question, index) => new Round { Index = index, Question = question, })
+            .Select((question, index) => new Round { Index = index, Question = question })
             .ToList();
 
         var game = new Game

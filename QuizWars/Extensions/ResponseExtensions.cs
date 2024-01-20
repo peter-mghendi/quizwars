@@ -1,8 +1,6 @@
-using QuizWars.Client;
 using QuizWars.Data;
 using QuizWars.Models;
 using QuizWars.Shared.Models;
-using QuizWars.Shared.Models.Request;
 using QuizWars.Shared.Models.Response;
 
 namespace QuizWars.Extensions;
@@ -32,13 +30,13 @@ public static class ResponseExtensions
 
     public static NotificationSubscriptionData AsResponse(this NotificationSubscription subscription)
     {
-        return new NotificationSubscriptionData{
-            NotificationSubscriptionId = subscription.Id,
-            UserId = subscription.User.Email,
-            Url = subscription.Url,
-            P256dh = subscription.P256dh,
-            Auth = subscription.Auth
-        };
+        return new NotificationSubscriptionData(
+            NotificationSubscriptionId: subscription.Id,
+            UserId: subscription.User.Email,
+            Url: subscription.Url,
+            P256dh: subscription.P256dh,
+            Auth: subscription.Auth
+        );
     }
 
     public static QuestionResponse AsResponse(this Question question) => new(

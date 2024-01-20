@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using QuizWars.Client;
 using QuizWars.Data;
+using QuizWars.Shared.Models.Response;
 
 namespace QuizWars.Components.Account;
 

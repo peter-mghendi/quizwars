@@ -6,7 +6,6 @@ using QuizWars.Data;
 using QuizWars.Extensions;
 using QuizWars.Models;
 using QuizWars.Shared.Models;
-using QuizWars.Shared.Models.Request;
 using QuizWars.Shared.Models.Response;
 
 namespace QuizWars.Controllers;
@@ -67,7 +66,7 @@ public class NotificationController(ApplicationDbContext context, UserManager<Ap
     }
 
     // PUT: api/notifications/5
-    [HttpPut("{id}")]
+    [HttpPut("{id:long}")]
     public async Task<IActionResult> PutNotification(long id)
     {
         var notification = await context.Notifications.FindAsync(id);

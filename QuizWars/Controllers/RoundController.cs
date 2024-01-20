@@ -10,7 +10,7 @@ namespace QuizWars.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("api/games/{identifier}/rounds")]
+[Route("api/games/{identifier:guid}/rounds")]
 public class RoundController(ApplicationDbContext context) : ControllerBase
 {
     // GET: api/games/0085f04e-8a30-449e-91e1-38899b4d3ed5/rounds
@@ -30,7 +30,7 @@ public class RoundController(ApplicationDbContext context) : ControllerBase
     }
 
     // GET: api/games/0085f04e-8a30-449e-91e1-38899b4d3ed5/rounds/3
-    [HttpGet("{index}")]
+    [HttpGet("{index:int}")]
     public async Task<ActionResult<RoundResponse>> GetRound(Guid identifier, int index)
     {
         var game = await GetGameAsync(identifier);

@@ -16,7 +16,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="@Cancel">Cancel</MudButton>
-        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await Go(Notification))">
+        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(() => Go(Notification))">
             Go!
         </MudButton>
     </DialogActions>
@@ -24,8 +24,7 @@
 
 @code {
 
-    [CascadingParameter]
-    MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter]
     public NotificationResponse Notification { get; set; } = null!;

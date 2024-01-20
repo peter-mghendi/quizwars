@@ -27,7 +27,7 @@ var connectionString = new NpgsqlConnectionStringBuilder
     Username = userInfo[0],
     Password = userInfo[1],
     Database = databaseUri.LocalPath.TrimStart('/'),
-    SslMode = SslMode.Prefer,
+    SslMode = SslMode.Prefer
 }.ToString();
 
 // Add services to the container.

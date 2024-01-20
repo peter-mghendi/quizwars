@@ -22,7 +22,7 @@
                 </MudCardHeader>
                 <MudCardContent>@notification.Text</MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(async () => await Go(notification))">
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(() => Go(notification))">
                         Go!
                     </MudButton>
                 </MudCardActions>

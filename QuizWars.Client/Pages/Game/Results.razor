@@ -57,7 +57,7 @@
                     <MudCardContent>
                         <MudRadioGroup SelectedOption="@Answer(round)" ReadOnly>
                             <MudStack>
-                                @foreach (var choice in @round.Question.Choices)
+                                @foreach (var choice in round.Question.Choices)
                                 {
                                     <MudRadio Color="@(IsAnswer(round, choice) ? Color.Success : Color.Default)"
                                               Option="@choice.Id">
@@ -110,7 +110,7 @@
         return round.Question.Choices.Single(c => c.IsCorrect).Id;
     }
 
-    private static int CalculatePoints(List<RoundResponse> rounds, UserInfo user)
+    private static int CalculatePoints(IEnumerable<RoundResponse> rounds, UserInfo user)
     {
         return rounds
             .SelectMany(r => r.Responses)

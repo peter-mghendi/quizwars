@@ -1,6 +1,5 @@
 using System.Net.Http.Json;
 using QuizWars.Shared.Models;
-using QuizWars.Shared.Models.Request;
 using QuizWars.Shared.Models.Response;
 
 namespace QuizWars.Sdk.Services;

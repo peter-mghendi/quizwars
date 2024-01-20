@@ -25,7 +25,7 @@ public class GameController(ApplicationDbContext context, ILogger<GameController
     }
 
     // GET: api/games/0085f04e-8a30-449e-91e1-38899b4d3ed5
-    [HttpGet("{identifier}")]
+    [HttpGet("{identifier:guid}")]
     public async Task<ActionResult<GameResponse>> GetGame(Guid identifier)
     {
         var game = await context.Games
@@ -44,7 +44,7 @@ public class GameController(ApplicationDbContext context, ILogger<GameController
 
     // PUT: api/games/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    [HttpPut("{id}")]
+    [HttpPut("{id:long}")]
     public async Task<IActionResult> PutGame(long id, Game game)
     {
         if (id != game.Id)
@@ -87,7 +87,7 @@ public class GameController(ApplicationDbContext context, ILogger<GameController
     }
 
     // DELETE: api/games/5
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:long}")]
     public async Task<IActionResult> DeleteGame(long id)
     {
         var game = await context.Games.FindAsync(id);
