@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="6.8.0" />
+    <PackageReference Include="Howler.Blazor" Version="0.9.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
     <PackageReference Include="MudBlazor" Version="6.12.0" />

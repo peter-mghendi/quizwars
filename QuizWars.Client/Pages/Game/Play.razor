@@ -1,10 +1,9 @@
 @page "/game/{Identifier:guid}/play"
+
 @using QuizWars.Shared.Models.Response
 @using QuizWars.Sdk
-@using QuizWars.Client.Extensions
 @using QuizWars.Shared.Models.Request
 @using System.Timers
-@using Howler.Blazor.Components
 @using static System.Threading.Tasks.Task
 
 @inject AuthenticationStateProvider Authenticator
@@ -29,8 +28,30 @@
                     <MudStack AlignItems="AlignItems.Center">
                         <MudText Typo="Typo.h4">@Game.Topic.Title</MudText>
                         <MudText>@Game.Topic.Description</MudText>
-                        <MudText Class="mb-4">@(Game.PlayerOne.Email) vs @(Game.PlayerTwo.Email)</MudText>
-                        <MudButton Class="mb-4" OnClick="@Start">Start!</MudButton>
+                        <MudText Class="mb-6">@(Game.PlayerOne.Email) vs @(Game.PlayerTwo.Email)</MudText>
+
+                        @if (_forced)
+                        {
+                            <MudText Class="mb-2">
+                                Starting without opponent. They can complete the challenge later.
+                            </MudText>
+                            <MudProgressCircular Color="Color.Primary" Class="mb-8" Indeterminate="true"/>
+                        }
+                        else if (_waiting)
+                        {
+                            <MudText Class="mb-2">Waiting for opponent. You can start without them.</MudText>
+                            <MudProgressCircular Color="Color.Info" Class="mb-8" Indeterminate="true"/>
+                        }
+                        else
+                        {
+                            <MudText Class="mb-2">Opponent has joined. Game will start shortly.</MudText>
+                            <MudProgressCircular Color="Color.Primary" Class="mb-8" Indeterminate="true"/>
+                        }
+
+                        <MudButton Class="mb-4" Color="Color.Primary" OnClick="@(() => Start(force: true))"
+                                   Disabled="@(_forced || !_waiting)">
+                            Start!
+                        </MudButton>
                         <MudText Typo="Typo.caption" Style="color: var(--mud-palette-text-secondary)">@Game.Identifier</MudText>
                     </MudStack>
                 </MudCardContent>
@@ -41,7 +62,19 @@
             <MudCard>
                 <MudProgressLinear Min="0" Max="10" Value="@TimeLeft" Color="ProgressColor"/>
                 <MudCardHeader>
-                    <MudText Typo="Typo.h5">@(CurrentRound.Index + 1)/@GameRounds: @(CurrentRound.Question.Text)</MudText>
+                    <div>
+                        @if (CurrentRound.Index + 1 == GameRounds)
+                        {
+                            <MudChip Icon="@Icons.Material.Rounded.RocketLaunch" Variant="Variant.Text"
+                                     Color="Color.Info" Class="mb-2">
+                                Double Points!
+                            </MudChip>
+                        }
+
+                        <MudText Typo="Typo.h5">
+                            @(CurrentRound.Index + 1)/@GameRounds: @(CurrentRound.Question.Text)
+                        </MudText>
+                    </div>
                 </MudCardHeader>
                 <MudCardContent>
                     <MudStack>
@@ -69,14 +102,16 @@
 @code {
     private const int GameRounds = 7;
 
-    private string username = null!;
+    private string _username = null!;
 
-    private int ticker = -1;
+    private bool _forced;
+    private bool _waiting = true;
 
-    private (long Choice, Color Color)? selection;
+    private int _ticker = -1;
 
-    [Parameter]
-    public Guid Identifier { get; set; }
+    private (long Choice, Color Color)? _selection;
+
+    [Parameter] public Guid Identifier { get; set; }
 
     private Timer? GameTimer { get; set; }
 
@@ -93,35 +128,43 @@
         > 5d => Color.Success,
         > 3d => Color.Warning,
         _ => Color.Error
-        };
+    };
 
     private (Color RadioColor, Color TextColor) GetOptionColors(ChoiceResponse choice)
     {
-        if (selection is null || selection.Value.Choice != choice.Id) return (Color.Primary, Color.Default);
-        return (selection.Value.Color, selection.Value.Color);
+        if (_selection is null || _selection.Value.Choice != choice.Id) return (Color.Primary, Color.Default);
+        return (_selection.Value.Color, _selection.Value.Color);
     }
 
     protected override async Task OnInitializedAsync()
     {
         var auth = await Authenticator.GetAuthenticationStateAsync();
-        username = auth.User.Identity!.Name!;
+        _username = auth.User.Identity!.Name!;
 
         Game = await QuizWars.Games.GetGame(Identifier);
     }
 
-    private async Task Start() => await LoadRound(index: 0);
+    private async Task Start(bool force = false)
+    {
+        _forced = force;
+        _waiting = false;
+        StateHasChanged();
+
+        await Delay(TimeSpan.FromSeconds(3));
+        await LoadRound(index: 0);
+    }
 
     private async Task Submit()
     {
         if (CurrentRound is null) return;
 
+        await DisposeTicker();
         DisposeTimer();
 
         var response = await SendResponse();
         await ShowFeedback(response: response);
         await Delay(TimeSpan.FromSeconds(1));
         await ShowNextScreen();
-        ;
     }
 
     // TODO: UI feedback for opponent answer.
@@ -132,7 +175,7 @@
 
         Console.WriteLine($"Response: {request}");
         var responses = await QuizWars.Responses.CreateResponse(Identifier, CurrentRound!.Index, request);
-        return responses.Single(r => r.User.Email == username);
+        return responses.Single(r => r.User.Email == _username);
     }
 
     private async Task ShowFeedback(ResponseResponse response)
@@ -144,7 +187,7 @@
         if (choice is not null)
         {
             if (choice.IsCorrect) (source, color) = ("correct", Color.Success);
-            selection = (choice.Id, color);
+            _selection = (choice.Id, color);
         }
 
         await Howl.Play($"/audio/{source}.mp3");
@@ -153,8 +196,8 @@
 
     private async Task ShowNextScreen()
     {
-        ticker = -1;
-        selection = null;
+        _ticker = -1;
+        _selection = null;
 
         if (CurrentRound!.Index + 1 < GameRounds)
         {
@@ -183,12 +226,11 @@
         {
             switch (TimeLeft)
             {
-                case < 5d when ticker < 0 && !await Howl.IsPlaying(ticker):
+                case < 5d when _ticker < 0 && !await Howl.IsPlaying(_ticker):
                     TimeLeft -= 0.1d;
                     
-                    
-                    ticker = await Howl.Play("/audio/ticker.mp3");
-                    Console.WriteLine($"Ticker: {ticker}");
+                    _ticker = await Howl.Play("/audio/ticker.mp3");
+                    Console.WriteLine($"Ticker: {_ticker}");
                     StateHasChanged();
                     break;
                 case > 0:
@@ -207,10 +249,15 @@
     private void DisposeTimer()
     {
         if (GameTimer == null) return;
-
+        
         GameTimer.Stop();
         GameTimer.Enabled = false;
         GameTimer.Dispose();
     }
 
+    private async Task DisposeTicker()
+    {
+        if (_ticker < 0 && !await Howl.IsPlaying(_ticker)) return;
+        await Howl.Stop(_ticker);
+    }
 }

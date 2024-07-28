@@ -1,3 +1,4 @@
+using Howler.Blazor.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -72,6 +73,9 @@ builder.Services.AddSingleton<IEmailSender, MailKitEmailSender>();
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityMailKitEmailSender>();
 
 builder.Services.AddScoped<GameService>();
+
+builder.Services.AddScoped<IHowl, Howl>();
+builder.Services.AddScoped<IHowlGlobal, HowlGlobal>();
 
 builder.Services.AddMudServices();
 

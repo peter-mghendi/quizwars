@@ -3,13 +3,17 @@
 @using QuizWars.Shared.Models.Response
 @using QuizWars.Sdk
 
+@inject AuthenticationStateProvider Authenticator
+@inject IHowl Howl
 @inject QuizWarsClient QuizWars
 
 <PageTitle>Game Over</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large">
     <MudStack>
-        @if (Game is null)
+        <Blafettis @ref="_blafettis" spread="90"/>
+
+        @if (Game is null || Rounds is { Count: 0 })
         {
             <MudText>Loading...</MudText>
         }
@@ -37,73 +41,135 @@
                 </MudCardContent>
             </MudCard>
 
-            @foreach (var round in Rounds)
-            {
-                <MudCard Class="rounded-lg">
-                    <MudCardHeader>
-                        <MudText Typo="Typo.h5">@(round.Index + 1)/@(Rounds.Count): @(round.Question.Text)</MudText>
-                    </MudCardHeader>
-                    <MudCardContent>
-                        <MudRadioGroup SelectedOption="@Answer(round)" ReadOnly>
-                            <MudStack>
-                                @foreach (var choice in round.Question.Choices)
-                                {
-                                    <MudRadio Color="@(IsAnswer(round, choice) ? Color.Success : Color.Default)"
-                                              Option="@choice.Id">
-                                        <MudText Color="@(IsAnswer(round, choice) ? Color.Success : Color.Default)"
-                                                 Class="me-2" Style="vertical-align: middle" Inline>
-                                            @choice.Text
-                                        </MudText>
+            <MudCard Class="rounded-lg pb-6">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h5">Questions</MudText>
+                    <MudSpacer/>
+                    <MudIconButton Icon="@Icons.Material.Rounded.Share"/>
+                    <MudIconButton Icon="@Icons.Material.Rounded.Flag" Color="Color.Error"/>
+                </MudCardHeader>
 
-                                        @* O(n²) :( *@
-                                        @foreach (var response in round.Responses.Where(response => choice.Id == response.Choice?.Id))
+                @* HACK: The height hack will not work for longer questions and answers. *@
+                <MudCarousel ItemsSource="Rounds" Class="mud-width-full" Style="height:25rem;" AutoCycle EnableSwipeGesture
+                             ShowArrows ShowBullets>
+                    <ItemTemplate>
+                        <MudCard Class="rounded-lg px-8" Elevation="0">
+                            <MudCardHeader>
+                                <MudText Typo="Typo.h6">
+                                    @(context.Index + 1)/@(Rounds.Count) : @(context.Question.Text)
+                                </MudText>
+                            </MudCardHeader>
+                            <MudCardContent>
+                                <MudRadioGroup Value="@(context.Answer?.Id ?? -1)" ReadOnly>
+                                    <MudStack>
+                                        @foreach (var choice in context.Question.Choices)
                                         {
-                                            <MudChip Color="@(IsAnswer(round, choice) ? Color.Success : Color.Error)"
-                                                     Variant="@Variant.Text">
-                                                @response.User.Email
-                                            </MudChip>
+                                            <MudRadio Color="@(context.IsAnswer(choice) ? Color.Success : Color.Default)"
+                                                      Value="@choice.Id">
+                                                <MudText Color="@(context.IsAnswer(choice) ? Color.Success : Color.Default)"
+                                                         Class="me-2" Style="vertical-align: middle" Inline>
+                                                    @choice.Text
+                                                </MudText>
+
+                                                @* O(n²) :( *@
+                                                @foreach (var response in context.Responses.Where(response => choice.Id == response.Choice?.Id))
+                                                {
+                                                    <MudChip Color="@(context.IsAnswer(choice) ? Color.Success : Color.Error)"
+                                                             Variant="@Variant.Text">
+                                                        @response.User.Email
+                                                    </MudChip>
+                                                }
+                                            </MudRadio>
                                         }
-                                    </MudRadio>
-                                }
-                            </MudStack>
-                        </MudRadioGroup>
-                    </MudCardContent>
-                </MudCard>
-            }
+                                    </MudStack>
+                                </MudRadioGroup>
+                            </MudCardContent>
+                        </MudCard>
+                    </ItemTemplate>
+                </MudCarousel>
+            </MudCard>
+
+            <MudCard Class="rounded-lg">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h5">Scoring</MudText>
+                </MudCardHeader>
+
+                <MudCardContent>
+                    <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@Labels" Width="100%"
+                              Height="350px" ChartOptions="@Options" @bind-SelectedIndex="_index" CanHideSeries/>
+                </MudCardContent>
+            </MudCard>
         }
     </MudStack>
 </MudContainer>
 
 @code {
+    private int _index = -1;
 
-    [Parameter]
-    public Guid Identifier { get; set; }
+    private string _username = null!;
+
+    private Blafettis? _blafettis;
+
+    [Parameter] public Guid Identifier { get; set; }
 
     private GameResponse? Game { get; set; }
 
     private List<RoundResponse> Rounds { get; set; } = [];
 
+    private UserInfo? Me => Game?.Players.SingleOrDefault(player => player.Email == _username);
+
+    private List<ChartSeries> Series => [PlayerSeries(Game!.PlayerOne), PlayerSeries(Game!.PlayerTwo)];
+
+    private static readonly string[] Labels = Enumerable.Range(0, 8).Select(x => x.ToString()).ToArray();
+
+    private static readonly ChartOptions Options = new() { YAxisTicks = 20, MaxNumYAxisTicks = 8 };
+
     protected override async Task OnInitializedAsync()
     {
+        var auth = await Authenticator.GetAuthenticationStateAsync();
+        _username = auth.User.Identity!.Name!;
+
         Game = await QuizWars.Games.GetGame(Identifier);
         Rounds = await QuizWars.Rounds.GetRounds(Identifier);
+
+        var winner = Winner();
+        if (winner is not null && winner.UserId == Me!.UserId)
+        {
+            // await Howl.Play("/audio/win.mp3"); // Requires user interaction to play.
+            _blafettis?.RaiseConfetti();
+        }
     }
 
-    private static bool IsAnswer(RoundResponse round, ChoiceResponse choice)
+    private ChartSeries PlayerSeries(UserInfo player)
     {
-        return Answer(round) == choice.Id;
+        var data = Rounds
+            .SelectMany(round => round.Responses.Where(response => response.User.UserId == player.UserId),
+                (round, response) => new { round.Index, response.Points })
+            .OrderBy(item => item.Index)
+            .GroupBy(item => item.Index)
+            .TakeWhile(group => group.Key == group.First().Index)
+            .OrderBy(group => group.Key)
+            .Aggregate(new List<double> { 0 }, (acc, group) =>
+            {
+                acc.Add(acc.Last() + group.Sum(item => item.Points));
+                return acc;
+            })
+            .ToArray();
+
+        return new ChartSeries { Name = player.Email, Data = data };
     }
 
-    private static long Answer(RoundResponse round)
+    private UserInfo? Winner()
     {
-        return round.Question.Choices.Single(c => c.IsCorrect).Id;
+        if (Rounds.Any(r => r.Responses.Count < 2)) return null;
+
+        var (p1, p2) = (Points(Game!.PlayerOne), Points(Game!.PlayerTwo));
+        return p1 > p2 ? Game.PlayerOne : p1 < p2 ? Game.PlayerTwo : null;
     }
 
-    private static int CalculatePoints(IEnumerable<RoundResponse> rounds, UserInfo user)
-    {
-        return rounds
-            .SelectMany(r => r.Responses)
-            .Where(r => r.User.Email == user.Email)
-            .Sum(r => r.Points);
-    }
+    private int Points(UserInfo player) => Rounds
+        .SelectMany(r => r.Responses)
+        .Where(r => r.User.Email == player.Email)
+        .ToList().Sum(r => r.Points);
+
 }
