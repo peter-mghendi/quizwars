@@ -8,5 +8,5 @@ public class Question
 
     public required Topic Topic { get; set; }
 
-    public List<Choice> Choices { get; } = new();
+    public List<Choice> Choices { get; } = [];
 }

@@ -6,10 +6,10 @@
 
 <MudLayout>
     <MudAppBar Elevation="0">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(_ => DrawerToggle())"/>
+        <MudIconButton Icon="@Icons.Material.Rounded.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(_ => DrawerToggle())"/>
         <MudText Typo="Typo.h5" Class="ml-3">QuizWars</MudText>
         <MudSpacer/>
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
+        <MudIconButton Icon="@Icons.Material.Rounded.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Responsive" ClipMode="DrawerClipMode.Docked" Elevation="0">
         <MudDrawerHeader>
@@ -26,7 +26,7 @@
                 <AuthorizeView>
                     <Authorized>
                         <MudNavLink Href="Account/Manage" Match="NavLinkMatch.All" Class="rounded-pill" Icon="@Icons.Material.Rounded.Person">@context.User.Identity?.Name</MudNavLink>
-                        <MudNavLink OnClick="Logout" Match="NavLinkMatch.All" Class="rounded-pill" Icon="@Icons.Material.TwoTone.Logout">Logout</MudNavLink>
+                        <MudNavLink OnClick="Logout" Match="NavLinkMatch.All" Class="rounded-pill" Icon="@Icons.Material.Rounded.Logout">Logout</MudNavLink>
                     </Authorized>
                     <NotAuthorized>
                         <MudNavLink Href="Account/Register" Match="NavLinkMatch.All" Class="rounded-pill" Icon="@Icons.Material.Rounded.PersonAddAlt1">Register</MudNavLink>

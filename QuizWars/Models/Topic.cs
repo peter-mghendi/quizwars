@@ -8,5 +8,5 @@ public class Topic
 
     public required string Description { get; set; }
 
-    public List<Question> Questions { get; } = new();
+    public List<Question> Questions { get; } = [];
 }

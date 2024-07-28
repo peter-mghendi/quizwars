@@ -14,5 +14,5 @@ public class Game
 
     public required ApplicationUser PlayerTwo { get; set; }
 
-    public List<Round> Rounds { get; init; } = new();
+    public List<Round> Rounds { get; init; } = [];
 }

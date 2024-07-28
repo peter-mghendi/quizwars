@@ -10,5 +10,5 @@ public class Round
 
     public required Question Question { get; set; }
 
-    public List<Response> Responses { get; } = new();
+    public List<Response> Responses { get; } = [];
 }
